@@ -2,6 +2,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 
 const Statistics = () => {
   const [timeframe, setTimeframe] = useState("1Y");
@@ -14,6 +16,20 @@ const Statistics = () => {
         high: 399,
         low: 223,
         average: 86.31,
+        historicalData: [
+          { date: "2023-01", level: 250 },
+          { date: "2023-02", level: 280 },
+          { date: "2023-03", level: 300 },
+          { date: "2023-04", level: 320 },
+          { date: "2023-05", level: 340 },
+          { date: "2023-06", level: 360 },
+          { date: "2023-07", level: 380 },
+          { date: "2023-08", level: 350 },
+          { date: "2023-09", level: 330 },
+          { date: "2023-10", level: 310 },
+          { date: "2023-11", level: 290 },
+          { date: "2023-12", level: 270 },
+        ]
       };
     },
   });
@@ -58,16 +74,45 @@ const Statistics = () => {
             </div>
             <div className="glass-card p-4">
               <div className="text-white/80 mb-1">Average</div>
-              <div className="text-2xl font-bold">{stats?.average}M</div>
+              <div className="text-2xl font-bold">{stats?.average}m</div>
             </div>
           </div>
         )}
 
         <div className="h-64 relative">
-          {/* TODO: Add chart implementation */}
-          <div className="absolute inset-0 flex items-center justify-center text-white/60">
-            Chart coming soon...
-          </div>
+          {!isLoading && stats?.historicalData && (
+            <ChartContainer 
+              className="w-full h-full" 
+              config={{
+                line: { theme: { light: "hsl(var(--primary))", dark: "hsl(var(--primary))" } },
+                background: { theme: { light: "hsl(var(--primary) / 0.1)", dark: "hsl(var(--primary) / 0.1)" } },
+              }}
+            >
+              <AreaChart data={stats.historicalData}>
+                <defs>
+                  <linearGradient id="colorLevel" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis 
+                  dataKey="date" 
+                  stroke="hsl(var(--foreground))" 
+                  tickFormatter={(value) => format(new Date(value), 'MMM')}
+                />
+                <YAxis stroke="hsl(var(--foreground))" />
+                <CartesianGrid strokeDasharray="3 3" />
+                <ChartTooltip />
+                <Area
+                  type="monotone"
+                  dataKey="level"
+                  stroke="hsl(var(--primary))"
+                  fillOpacity={1}
+                  fill="url(#colorLevel)"
+                />
+              </AreaChart>
+            </ChartContainer>
+          )}
         </div>
       </div>
     </div>
