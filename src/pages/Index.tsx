@@ -1,30 +1,14 @@
 
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { format } from "date-fns";
 
 const Index = () => {
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [locationError, setLocationError] = useState<string>("");
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (error) => {
-          setLocationError("Location access denied");
-        }
-      );
-    } else {
-      setLocationError("Geolocation is not supported by your browser");
-    }
-  }, []);
+  // Hardcoded Montreal coordinates
+  const location = {
+    lat: 45.5017,
+    lng: -73.5673
+  };
 
   const { data: waterLevel, isLoading } = useQuery({
     queryKey: ["currentWaterLevel", location],
@@ -32,7 +16,6 @@ const Index = () => {
       // TODO: Replace with actual API call
       return { level: 75 };
     },
-    enabled: !!location,
   });
 
   return (
@@ -42,7 +25,7 @@ const Index = () => {
         
         <div className="flex items-center gap-2 text-white/80">
           <MapPin className="w-5 h-5" />
-          <span>{locationError || "Fetching location..."}</span>
+          <span>Montreal, Canada</span>
         </div>
 
         <div className="text-white/60">
